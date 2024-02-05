@@ -234,4 +234,9 @@ public class OutRecord implements Comparable<OutRecord> {
     public int numBytes() {
         return SIZE;
     }
+
+    public String formatOutputRecord() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'formatOutputRecord'");
+    }
 }
