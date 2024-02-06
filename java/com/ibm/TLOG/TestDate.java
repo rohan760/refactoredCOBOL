@@ -1,4 +1,4 @@
-package com.ibm.dataloop;
+package com.ibm.TLOG;
 
 import com.ibm.jzos.fields.*;
 import java.io.UnsupportedEncodingException;

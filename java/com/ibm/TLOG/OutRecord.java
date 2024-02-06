@@ -1,4 +1,4 @@
-package com.ibm.dataloop;
+package com.ibm.TLOG;
 
 import com.ibm.jzos.fields.*;
 import java.io.UnsupportedEncodingException;
@@ -12,41 +12,41 @@ public class OutRecord implements Comparable<OutRecord> {
         factory.setStringEncoding("IBM-1047");
     }
     
-    private static final StringField CATEGORYOUT = factory.getStringField(28);
     private static final StringField GROUPOUT = factory.getStringField(28);
     private static final StringField AUTHOROUT = factory.getStringField(28);
     private static final StringField SUBJECTOUT = factory.getStringField(66);
     private static final StringField IDOUT = factory.getStringField(6);
     private static final ByteArrayField DATEOUT = factory.getByteArrayField(DateOut.SIZE);
+    private static final StringField CATEGORYOUT = factory.getStringField(28);
     protected static final int SIZE = factory.getOffset();
     // End of COBOL-compatible binary serialization metadata
     
-    private String categoryOut = "";
     private String groupOut = "";
     private String authorOut = "";
     private String subjectOut = "";
     private String idOut = "";
     private DateOut dateOut = new DateOut();
+    private String categoryOut = "";
     
     public OutRecord() {
     }
     
-    public OutRecord(String categoryOut, String groupOut, String authorOut, String subjectOut, String idOut, DateOut dateOut) {
-        this.categoryOut = categoryOut;
+    public OutRecord(String groupOut, String authorOut, String subjectOut, String idOut, DateOut dateOut, String categoryOut) {
         this.groupOut = groupOut;
         this.authorOut = authorOut;
         this.subjectOut = subjectOut;
         this.idOut = idOut;
         this.dateOut = dateOut;
+        this.categoryOut = categoryOut;
     }
     
     public OutRecord(OutRecord that) {
-        this.categoryOut = that.categoryOut;
         this.groupOut = that.groupOut;
         this.authorOut = that.authorOut;
         this.subjectOut = that.subjectOut;
         this.idOut = that.idOut;
         this.dateOut = new DateOut(that.dateOut);
+        this.categoryOut = that.categoryOut;
     }
     
     protected OutRecord(byte[] bytes, int offset) {
@@ -71,14 +71,6 @@ public class OutRecord implements Comparable<OutRecord> {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-    
-    public String getCategoryOut() {
-        return this.categoryOut;
-    }
-    
-    public void setCategoryOut(String categoryOut) {
-        this.categoryOut = categoryOut;
     }
     
     public String getGroupOut() {
@@ -121,11 +113,17 @@ public class OutRecord implements Comparable<OutRecord> {
         this.dateOut = dateOut;
     }
     
+    public String getCategoryOut() {
+        return this.categoryOut;
+    }
+    
+    public void setCategoryOut(String categoryOut) {
+        this.categoryOut = categoryOut;
+    }
+    
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("{ categoryOut=\"");
-        s.append(getCategoryOut());
-        s.append("\" groupOut=\"");
+        s.append("{ groupOut=\"");
         s.append(getGroupOut());
         s.append("\" authorOut=\"");
         s.append(getAuthorOut());
@@ -135,17 +133,19 @@ public class OutRecord implements Comparable<OutRecord> {
         s.append(getIdOut());
         s.append("\" dateOut=\"");
         s.append(getDateOut());
+        s.append("\" categoryOut=\"");
+        s.append(getCategoryOut());
         s.append("\" }");
         return s.toString();
     }
     
     public boolean equals(OutRecord that) {
-        return this.categoryOut.equals(that.categoryOut) &&
-            this.groupOut.equals(that.groupOut) &&
+        return this.groupOut.equals(that.groupOut) &&
             this.authorOut.equals(that.authorOut) &&
             this.subjectOut.equals(that.subjectOut) &&
             this.idOut.equals(that.idOut) &&
-            this.dateOut.equals(that.dateOut);
+            this.dateOut.equals(that.dateOut) &&
+            this.categoryOut.equals(that.categoryOut);
     }
     
     @Override
@@ -155,19 +155,17 @@ public class OutRecord implements Comparable<OutRecord> {
     
     @Override
     public int hashCode() {
-        return categoryOut.hashCode() ^
-            Integer.rotateLeft(groupOut.hashCode(), 1) ^
-            Integer.rotateLeft(authorOut.hashCode(), 2) ^
-            Integer.rotateLeft(subjectOut.hashCode(), 3) ^
-            Integer.rotateLeft(idOut.hashCode(), 4) ^
-            Integer.rotateLeft(dateOut.hashCode(), 5);
+        return groupOut.hashCode() ^
+            Integer.rotateLeft(authorOut.hashCode(), 1) ^
+            Integer.rotateLeft(subjectOut.hashCode(), 2) ^
+            Integer.rotateLeft(idOut.hashCode(), 3) ^
+            Integer.rotateLeft(dateOut.hashCode(), 4) ^
+            Integer.rotateLeft(categoryOut.hashCode(), 5);
     }
     
     @Override
     public int compareTo(OutRecord that) {
-        int c = this.categoryOut.compareTo(that.categoryOut);
-        if ( c != 0 ) return c;
-        c = this.groupOut.compareTo(that.groupOut);
+        int c = this.groupOut.compareTo(that.groupOut);
         if ( c != 0 ) return c;
         c = this.authorOut.compareTo(that.authorOut);
         if ( c != 0 ) return c;
@@ -176,16 +174,18 @@ public class OutRecord implements Comparable<OutRecord> {
         c = this.idOut.compareTo(that.idOut);
         if ( c != 0 ) return c;
         c = this.dateOut.compareTo(that.dateOut);
+        if ( c != 0 ) return c;
+        c = this.categoryOut.compareTo(that.categoryOut);
         return c;
     }
     
     public byte[] getBytes(byte[] bytes, int offset) {
-        CATEGORYOUT.putString(categoryOut, bytes, offset);
         GROUPOUT.putString(groupOut, bytes, offset);
         AUTHOROUT.putString(authorOut, bytes, offset);
         SUBJECTOUT.putString(subjectOut, bytes, offset);
         IDOUT.putString(idOut, bytes, offset);
         dateOut.getBytes(bytes, DATEOUT.getOffset() + offset);
+        CATEGORYOUT.putString(categoryOut, bytes, offset);
         return bytes;
     }
     
@@ -211,12 +211,12 @@ public class OutRecord implements Comparable<OutRecord> {
             Arrays.fill(newBytes, bytes.length, SIZE + offset, (byte)0x40 /*default EBCDIC space character*/);
             bytes = newBytes;
         }
-        categoryOut = CATEGORYOUT.getString(bytes, offset);
         groupOut = GROUPOUT.getString(bytes, offset);
         authorOut = AUTHOROUT.getString(bytes, offset);
         subjectOut = SUBJECTOUT.getString(bytes, offset);
         idOut = IDOUT.getString(bytes, offset);
         dateOut.setBytes(bytes, DATEOUT.getOffset() + offset);
+        categoryOut = CATEGORYOUT.getString(bytes, offset);
     }
     
     public final void setBytes(byte[] bytes) {
@@ -233,10 +233,5 @@ public class OutRecord implements Comparable<OutRecord> {
     
     public int numBytes() {
         return SIZE;
-    }
-
-    public String formatOutputRecord() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'formatOutputRecord'");
     }
 }

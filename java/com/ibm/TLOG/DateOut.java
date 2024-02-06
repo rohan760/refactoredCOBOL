@@ -1,4 +1,4 @@
-package com.ibm.dataloop;
+package com.ibm.TLOG;
 
 import com.ibm.jzos.fields.*;
 import java.io.UnsupportedEncodingException;
@@ -12,29 +12,29 @@ public class DateOut implements Comparable<DateOut> {
         factory.setStringEncoding("IBM-1047");
     }
     
-    private static final StringField DAYOUT = factory.getStringField(2);
     private static final StringField YEAROUT = factory.getStringField(4);
     private static final StringField MONTHOUT = factory.getStringField(2);
+    private static final StringField DAYOUT = factory.getStringField(2);
     protected static final int SIZE = factory.getOffset();
     // End of COBOL-compatible binary serialization metadata
     
-    private String dayOut = "";
     private String yearOut = "";
     private String monthOut = "";
+    private String dayOut = "";
     
     public DateOut() {
     }
     
-    public DateOut(String dayOut, String yearOut, String monthOut) {
-        this.dayOut = dayOut;
+    public DateOut(String yearOut, String monthOut, String dayOut) {
         this.yearOut = yearOut;
         this.monthOut = monthOut;
+        this.dayOut = dayOut;
     }
     
     public DateOut(DateOut that) {
-        this.dayOut = that.dayOut;
         this.yearOut = that.yearOut;
         this.monthOut = that.monthOut;
+        this.dayOut = that.dayOut;
     }
     
     protected DateOut(byte[] bytes, int offset) {
@@ -61,14 +61,6 @@ public class DateOut implements Comparable<DateOut> {
         }
     }
     
-    public String getDayOut() {
-        return this.dayOut;
-    }
-    
-    public void setDayOut(String dayOut) {
-        this.dayOut = dayOut;
-    }
-    
     public String getYearOut() {
         return this.yearOut;
     }
@@ -85,22 +77,30 @@ public class DateOut implements Comparable<DateOut> {
         this.monthOut = monthOut;
     }
     
+    public String getDayOut() {
+        return this.dayOut;
+    }
+    
+    public void setDayOut(String dayOut) {
+        this.dayOut = dayOut;
+    }
+    
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("{ dayOut=\"");
-        s.append(getDayOut());
-        s.append("\" yearOut=\"");
+        s.append("{ yearOut=\"");
         s.append(getYearOut());
         s.append("\" monthOut=\"");
         s.append(getMonthOut());
+        s.append("\" dayOut=\"");
+        s.append(getDayOut());
         s.append("\" }");
         return s.toString();
     }
     
     public boolean equals(DateOut that) {
-        return this.dayOut.equals(that.dayOut) &&
-            this.yearOut.equals(that.yearOut) &&
-            this.monthOut.equals(that.monthOut);
+        return this.yearOut.equals(that.yearOut) &&
+            this.monthOut.equals(that.monthOut) &&
+            this.dayOut.equals(that.dayOut);
     }
     
     @Override
@@ -110,25 +110,25 @@ public class DateOut implements Comparable<DateOut> {
     
     @Override
     public int hashCode() {
-        return dayOut.hashCode() ^
-            Integer.rotateLeft(yearOut.hashCode(), 1) ^
-            Integer.rotateLeft(monthOut.hashCode(), 2);
+        return yearOut.hashCode() ^
+            Integer.rotateLeft(monthOut.hashCode(), 1) ^
+            Integer.rotateLeft(dayOut.hashCode(), 2);
     }
     
     @Override
     public int compareTo(DateOut that) {
-        int c = this.dayOut.compareTo(that.dayOut);
-        if ( c != 0 ) return c;
-        c = this.yearOut.compareTo(that.yearOut);
+        int c = this.yearOut.compareTo(that.yearOut);
         if ( c != 0 ) return c;
         c = this.monthOut.compareTo(that.monthOut);
+        if ( c != 0 ) return c;
+        c = this.dayOut.compareTo(that.dayOut);
         return c;
     }
     
     public byte[] getBytes(byte[] bytes, int offset) {
-        DAYOUT.putString(dayOut, bytes, offset);
         YEAROUT.putString(yearOut, bytes, offset);
         MONTHOUT.putString(monthOut, bytes, offset);
+        DAYOUT.putString(dayOut, bytes, offset);
         return bytes;
     }
     
@@ -154,9 +154,9 @@ public class DateOut implements Comparable<DateOut> {
             Arrays.fill(newBytes, bytes.length, SIZE + offset, (byte)0x40 /*default EBCDIC space character*/);
             bytes = newBytes;
         }
-        dayOut = DAYOUT.getString(bytes, offset);
         yearOut = YEAROUT.getString(bytes, offset);
         monthOut = MONTHOUT.getString(bytes, offset);
+        dayOut = DAYOUT.getString(bytes, offset);
     }
     
     public final void setBytes(byte[] bytes) {

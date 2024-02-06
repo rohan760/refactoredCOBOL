@@ -1,4 +1,4 @@
-package com.ibm.dataloop;
+package com.ibm.TLOG;
 
 import com.ibm.jzos.fields.*;
 import java.io.UnsupportedEncodingException;
@@ -80,6 +80,8 @@ public class HrdTestTrackingRecord implements Comparable<HrdTestTrackingRecord> 
             throw new RuntimeException(e);
         }
     }
+    
+    public void addPara(char tlogEofSwitch, int wsIdSum) {}
     
     public int getTestRecordId() {
         return this.testRecordId;
